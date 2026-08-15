@@ -6,12 +6,22 @@ export type CreateContextOptions = {
 };
 
 export async function createContext({ context }: CreateContextOptions) {
+  const requestHeaders = context.req.raw.headers;
   const session = await auth.api.getSession({
-    headers: context.req.raw.headers,
+    headers: requestHeaders,
   });
+  const organizationId = session?.session.activeOrganizationId ?? null;
+  const member = organizationId
+    ? await auth.api.getActiveMember({
+        headers: requestHeaders,
+      })
+    : null;
+
   return {
-    auth: null,
     session,
+    requestHeaders,
+    organizationId,
+    member,
   };
 }
 

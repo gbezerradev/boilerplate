@@ -12,6 +12,7 @@
   "dependencies": {
     "@boilerplate/api": "*",
     "@boilerplate/auth": "*",
+    "@boilerplate/billing": "*",
     "@boilerplate/db": "*",
     "@boilerplate/env": "*",
     "@hono/node-server": "^2.0.12",

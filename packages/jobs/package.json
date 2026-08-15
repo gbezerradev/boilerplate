@@ -1,0 +1,20 @@
+{
+  "name": "@boilerplate/jobs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@boilerplate/db": "*",
+    "drizzle-orm": "^0.45.2"
+  },
+  "devDependencies": {
+    "@boilerplate/config": "*",
+    "typescript": "^6.0.3"
+  }
+}

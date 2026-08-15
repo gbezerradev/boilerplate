@@ -1,4 +1,6 @@
-import { Button } from "@boilerplate/ui/components/button";
+"use client";
+
+import { Button, buttonVariants } from "@boilerplate/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,8 +26,8 @@ export default function UserMenu() {
 
   if (!session) {
     return (
-      <Link href="/login">
-        <Button variant="outline">Sign In</Button>
+      <Link href="/login" className={buttonVariants({ variant: "outline" })}>
+        Sign in
       </Link>
     );
   }

@@ -1,16 +1,25 @@
-"use client";
+import LoginPanel from "@/components/login-panel";
 
-import { useState } from "react";
+interface LoginPageProps {
+  searchParams: Promise<{
+    verified?: string;
+    reset?: string;
+    error?: string;
+    callbackURL?: string;
+  }>;
+}
 
-import SignInForm from "@/components/sign-in-form";
-import SignUpForm from "@/components/sign-up-form";
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
+  const notice = params.verified === "true" ? "verified" : params.reset === "true" ? "reset" : null;
+  const callbackURL =
+    params.callbackURL?.startsWith("/") && !params.callbackURL.startsWith("//")
+      ? params.callbackURL
+      : "/dashboard";
 
-export default function LoginPage() {
-  const [showSignIn, setShowSignIn] = useState(false);
-
-  return showSignIn ? (
-    <SignInForm onSwitchToSignUp={() => setShowSignIn(false)} />
-  ) : (
-    <SignUpForm onSwitchToSignIn={() => setShowSignIn(true)} />
+  return (
+    <main id="main-content" className="flex min-h-svh items-center justify-center px-4 py-12">
+      <LoginPanel notice={notice} error={params.error} callbackURL={callbackURL} />
+    </main>
   );
 }

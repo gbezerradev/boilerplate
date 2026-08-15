@@ -3,9 +3,7 @@ import { redirect } from "next/navigation";
 
 import { authClient } from "@/lib/auth-client";
 
-import Dashboard from "./dashboard";
-
-export default async function DashboardPage() {
+export default async function InviteMemberPage() {
   const session = await authClient.getSession({
     fetchOptions: {
       headers: await headers(),
@@ -14,14 +12,8 @@ export default async function DashboardPage() {
   });
 
   if (!session?.user) {
-    redirect("/login");
+    redirect("/login?callbackURL=/organization/invite");
   }
 
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome {session.user.name}</p>
-      <Dashboard session={session} />
-    </div>
-  );
+  redirect("/settings/members");
 }

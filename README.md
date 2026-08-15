@@ -1,130 +1,207 @@
-# boilerplate
+# SaaS Boilerplate
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Hono, TRPC, and more.
+A production-oriented TypeScript foundation for multi-tenant SaaS products. It includes a Next.js
+application, Hono/tRPC API, PostgreSQL, a persistent worker, and provider abstractions for common
+external services.
 
-## Features
+## Included
 
-- **TypeScript** - For type safety and improved developer experience
-- **Next.js** - Full-stack React framework
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
-- **Hono** - Lightweight, performant server framework
-- **tRPC** - End-to-end type-safe APIs
-- **Node.js** - Runtime environment
-- **Drizzle** - TypeScript-first ORM
-- **PostgreSQL** - Database engine
-- **Authentication** - Better-Auth
-- **Oxlint** - Oxlint + Oxfmt (linting & formatting)
-- **Vite+** - Unified Vite toolchain, workspace task runner, linting, and formatting
+- Better Auth password accounts, required email verification, password reset, and session controls
+- Organizations, invitations, active-workspace sessions, and owner/admin/member RBAC
+- Tenant-scoped projects, files, audit logs, and outgoing webhooks
+- Stripe Checkout, customer portal, signed/idempotent webhooks, plans, and server entitlements
+- React Email templates with console and Resend delivery
+- PostgreSQL jobs with idempotency, `SKIP LOCKED` claims, retries, and a separate worker
+- S3-compatible uploads/downloads through short-lived signed URLs
+- PostHog-compatible server analytics
+- Deterministic feature-flag rollouts and workspace overrides
+- Platform administration protected by a server-side email allowlist
+- Responsive app shell, accessible settings, dark mode, and shadcn/ui
+- Health endpoints, request IDs, structured logs, secure headers, CI, Vitest, and Playwright
 
-## Getting Started
+## Stack
 
-First, install the dependencies:
+Next.js 16, React 19, Hono, tRPC 11, Better Auth, Drizzle ORM, PostgreSQL 18, Tailwind CSS,
+shadcn/ui, Vite+, Vitest, and Playwright.
+
+## Quick Start
+
+Requirements: Node.js 24+, npm 12+, and PostgreSQL 18 (or Docker).
 
 ```bash
 npm install
-```
-
-## Database Setup
-
-This project uses PostgreSQL with Drizzle ORM.
-
-1. Make sure you have a PostgreSQL database set up.
-2. Update your `apps/server/.env` file with your PostgreSQL connection details.
-
-3. Apply the schema to your database:
-
-```bash
-npm run db:push
-```
-
-Then, run the development server:
-
-```bash
+cp apps/server/.env.example apps/server/.env
+cp apps/web/.env.example apps/web/.env
+npm run db:start
+npm run db:migrate
 npm run dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
-The API is running at [http://localhost:3000](http://localhost:3000).
+Replace `BETTER_AUTH_SECRET` with a random value of at least 32 characters before sharing or
+deploying the app. Open <http://localhost:3001>; the API runs at <http://localhost:3000>.
 
-## UI Customization
+`npm run docker:up` starts PostgreSQL, runs migrations once, then starts the API, worker, and web
+app.
 
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
+## Configuration
 
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
+Committed examples document every variable:
 
-### Add more shared components
+- `apps/server/.env.example`: API, worker, providers, and secrets
+- `apps/web/.env.example`: public API URL and server-only admin-navigation setting
 
-Run this from the project root to add more primitives to the shared UI package:
+The API validates its environment at startup. Optional providers are disabled by default and fail
+clearly when enabled without required credentials.
+
+### Email and Worker
+
+Development uses rendered console emails. Preview templates with `npm run dev:email` at
+<http://localhost:3002>.
+
+```env
+EMAIL_PROVIDER=resend
+EMAIL_FROM=Your Product <noreply@your-domain.com>
+RESEND_API_KEY=re_...
+EMAIL_DELIVERY_MODE=queued
+```
+
+With queued delivery, run `npm run dev:worker` beside the API. Production defaults to queued;
+development defaults to inline.
+
+### Stripe Billing
+
+```env
+BILLING_PROVIDER=stripe
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRICE_PRO=price_...
+```
+
+Register `POST /webhooks/stripe` for `checkout.session.completed` and the three
+`customer.subscription.*` lifecycle events. The handler verifies the raw signature, deduplicates
+event IDs transactionally, and rejects stale subscription events. Project/member limits are always
+enforced on the server.
+
+### S3-Compatible Storage
+
+```env
+STORAGE_PROVIDER=s3
+S3_BUCKET=your-private-bucket
+S3_REGION=us-east-1
+# Optional for R2, MinIO, or another compatible service:
+S3_ENDPOINT=https://storage.example.com
+S3_ACCESS_KEY_ID=...
+S3_SECRET_ACCESS_KEY=...
+```
+
+The browser uploads with a 10-minute signed request. The API verifies size and content type with
+`HeadObject` before exposing metadata. Keep the bucket private and allow browser `PUT` from the web
+origin in bucket CORS.
+
+### Analytics
+
+```env
+ANALYTICS_PROVIDER=posthog
+POSTHOG_API_KEY=phc_...
+POSTHOG_HOST=https://us.i.posthog.com
+```
+
+`disabled` and `console` providers are available. Analytics failures are logged without failing the
+product operation.
+
+### Platform Administration
+
+Set the same comma-separated value on the API and Next.js server:
+
+```env
+ADMIN_EMAILS=founder@example.com,ops@example.com
+```
+
+Navigation visibility is only a convenience; every admin API operation independently verifies the
+authenticated email.
+
+## Tenant and Integration Security
+
+The session stores an active organization. API context resolves its membership, and procedures
+derive `organizationId` from server context. Product inputs do not accept tenant IDs. Queries and
+mutations include the derived tenant predicate; project writes store audit records transactionally.
+
+RBAC lives in `packages/auth/src/permissions.ts`. Billing management is owner-only; integrations are
+managed by owners/admins; audit logs require admin/owner plus the Pro entitlement.
+
+Outgoing webhooks accept only public HTTPS destinations, encrypt signing secrets with AES-256-GCM,
+reject redirects, and retry through the worker. Receivers verify `x-webhook-signature` over
+`<x-webhook-timestamp>.<raw-body>` with HMAC-SHA256 (`v1=<hex>`). Use restricted production egress as
+an additional SSRF boundary. See [SECURITY.md](./SECURITY.md).
+
+## Database and Migrations
 
 ```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
+npm run db:generate
+npm run db:migrate
 ```
 
-Import shared components like this:
+Commit generated migrations and run them before new app code. Use `db:push` only for disposable
+development databases. CI and Docker Compose use migrations.
 
-```tsx
-import { Button } from "@boilerplate/ui/components/button";
+## Verification
+
+```bash
+npm run format:check
+npm run lint
+npm run check-types
+npm test
+npm run build
+npm run test:e2e
+npm audit --omit=dev --audit-level=high
 ```
 
-### Add app-specific blocks
+CI runs these checks with PostgreSQL. Local E2E skips the database-writing signup test unless `CI`
+is set.
 
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
+## Operations
 
-## Deployment
+- `GET /health/live`: process liveness
+- `GET /health/ready`: PostgreSQL readiness
+- `X-Request-Id`: propagated/generated correlation ID
+- API/worker logs: structured JSON
+- Audit events: tenant-scoped records with sensitive metadata redaction
 
-### Docker Compose
+Queue failures use capped exponential backoff. Stale locks are reclaimable, and unknown job types
+fail visibly in platform administration.
 
-- Target: web + server
-- Config: `docker-compose.yml` (app Dockerfiles live in `apps/*/Dockerfile`)
-- Build images: npm run docker:build
-- Start: npm run docker:up
-- Logs: npm run docker:logs
-- Stop: npm run docker:down
+## Structure
 
-Environment variables are read from each app's `.env` file (baked into web builds for public variables) and overridden in `docker-compose.yml` for container networking.
-
-For more details, see the guide on [Deploying with Docker Compose](https://www.better-t-stack.dev/docs/guides/docker).
-
-## Git Hooks and Formatting
-
-- Optional native Vite+ hooks: `npm run hooks:setup`
-- Docs: [Vite+ commit hooks](https://viteplus.dev/guide/commit-hooks)
-- Run checks: `npm run check`
-
-## Project Structure
-
-```
-boilerplate/
-├── apps/
-│   ├── web/         # Frontend application (Next.js)
-│   └── server/      # Backend API (Hono, TRPC)
-├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
-│   ├── api/         # API layer / business logic
-│   ├── auth/        # Authentication configuration & logic
-│   └── db/          # Database schema & queries
+```text
+apps/
+  web/             Next.js UI
+  server/          Hono API
+  worker/          Background worker
+packages/
+  api/             tRPC orchestration
+  auth/            Better Auth and RBAC
+  db/              Drizzle schema and migrations
+  ui/              Shared shadcn/ui
+  email/           Email templates/providers
+  billing/         Stripe and entitlements
+  audit/           Audit construction/redaction
+  jobs/            PostgreSQL queue
+  storage/         S3 provider
+  analytics/       Analytics providers
+  feature-flags/   Evaluation and rollout
+  integrations/    Webhook encryption/signing/delivery
+  env/             Typed environment validation
 ```
 
-## Available Scripts
+See [docs/architecture.md](./docs/architecture.md) for request and event flows.
 
-- `npm run dev`: Start all applications in development mode
-- `npm run build`: Build all applications
-- `npm run dev:web`: Start only the web application
-- `npm run dev:server`: Start only the server
-- `npm run check-types`: Check TypeScript types across all apps
-- `npm run db:push`: Push schema changes to database
-- `npm run db:generate`: Generate database client/types
-- `npm run db:migrate`: Run database migrations
-- `npm run db:studio`: Open database studio UI
-- `npm run check`: Run Vite+ format/lint checks and workspace TypeScript checks
-- `npm run lint`: Run Vite+ lint checks
-- `npm run format`: Run Vite+ formatting
-- `npm run staged`: Run Vite+ checks against staged files
-- `npm run hooks:setup`: Install Vite+ native Git hooks with `vp config`
-- `npm run docker:build`: Build the Docker Compose images
-- `npm run docker:up`: Build and start the Docker Compose stack
-- `npm run docker:logs`: Tail logs from the Docker Compose stack
-- `npm run docker:down`: Stop the Docker Compose stack
+## Useful Scripts
+
+- `npm run dev`, `dev:web`, `dev:server`, `dev:worker`, `dev:email`
+- `npm run db:start`, `db:stop`, `db:migrate`, `db:generate`, `db:studio`
+- `npm run test`, `test:watch`, `test:e2e`
+- `npm run format`, `format:check`, `lint`, `check-types`, `build`
+- `npm run docker:up`, `docker:logs`, `docker:down`
+
+Shared tokens live in `packages/ui/src/styles/globals.css`. Add shared primitives with shadcn using
+`-c packages/ui`.

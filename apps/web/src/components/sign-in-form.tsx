@@ -1,18 +1,39 @@
-import { Button } from "@boilerplate/ui/components/button";
+"use client";
+
+import { Button, buttonVariants } from "@boilerplate/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@boilerplate/ui/components/card";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@boilerplate/ui/components/field";
 import { Input } from "@boilerplate/ui/components/input";
-import { Label } from "@boilerplate/ui/components/label";
 import { useForm } from "@tanstack/react-form";
+import type { Route } from "next";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
 
-import Loader from "./loader";
-
-export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () => void }) {
+export default function SignInForm({
+  callbackURL,
+  onSwitchToSignUp,
+}: {
+  callbackURL: string;
+  onSwitchToSignUp: () => void;
+}) {
   const router = useRouter();
-  const { isPending } = authClient.useSession();
 
   const form = useForm({
     defaultValues: {
@@ -27,105 +48,123 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
         },
         {
           onSuccess: () => {
-            router.push("/dashboard");
-            toast.success("Sign in successful");
+            router.push(callbackURL as Route);
+            toast.success("Signed in successfully");
           },
-          onError: (error) => {
-            toast.error(error.error.message || error.error.statusText);
+          onError: ({ error }) => {
+            const message =
+              error.code === "EMAIL_NOT_VERIFIED"
+                ? "Verify your email address before signing in."
+                : error.message || error.statusText;
+            toast.error(message);
           },
         },
       );
     },
     validators: {
       onSubmit: z.object({
-        email: z.email("Invalid email address"),
+        email: z.email("Enter a valid email address"),
         password: z.string().min(8, "Password must be at least 8 characters"),
       }),
     },
   });
 
-  if (isPending) {
-    return <Loader />;
-  }
-
   return (
-    <div className="mx-auto w-full mt-10 max-w-md p-6">
-      <h1 className="mb-6 text-center text-3xl font-bold">Welcome Back</h1>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
-        }}
-        className="space-y-4"
-      >
-        <div>
-          <form.Field name="email">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="email"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
-
-        <div>
-          <form.Field name="password">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Password</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
-          </form.Field>
-        </div>
-
-        <form.Subscribe
-          selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle>
+          <h1>Welcome back</h1>
+        </CardTitle>
+        <CardDescription>Sign in to continue to your workspace.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            void form.handleSubmit();
+          }}
         >
-          {({ canSubmit, isSubmitting }) => (
-            <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Sign In"}
-            </Button>
-          )}
-        </form.Subscribe>
-      </form>
+          <FieldGroup>
+            <form.Field name="email">
+              {(field) => {
+                const isInvalid = field.state.meta.errors.length > 0;
 
-      <div className="mt-4 text-center">
-        <Button
-          variant="link"
-          onClick={onSwitchToSignUp}
-          className="text-indigo-600 hover:text-indigo-800"
-        >
-          Need an account? Sign Up
+                return (
+                  <Field data-invalid={isInvalid || undefined}>
+                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type="email"
+                      autoComplete="email"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                      aria-invalid={isInvalid}
+                    />
+                    <FieldError errors={field.state.meta.errors} />
+                  </Field>
+                );
+              }}
+            </form.Field>
+
+            <form.Field name="password">
+              {(field) => {
+                const isInvalid = field.state.meta.errors.length > 0;
+
+                return (
+                  <Field data-invalid={isInvalid || undefined}>
+                    <div className="flex items-center justify-between gap-4">
+                      <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                      <Link
+                        href="/forgot-password"
+                        className={buttonVariants({ variant: "link", size: "xs" })}
+                      >
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type="password"
+                      autoComplete="current-password"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                      aria-invalid={isInvalid}
+                    />
+                    <FieldError errors={field.state.meta.errors} />
+                  </Field>
+                );
+              }}
+            </form.Field>
+
+            <form.Subscribe
+              selector={(state) => ({
+                canSubmit: state.canSubmit,
+                isSubmitting: state.isSubmitting,
+              })}
+            >
+              {({ canSubmit, isSubmitting }) => (
+                <Field>
+                  <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
+                    {isSubmitting ? "Signing in…" : "Sign in"}
+                  </Button>
+                  <FieldDescription className="text-center">
+                    By continuing, you agree to the product terms and privacy policy.
+                  </FieldDescription>
+                </Field>
+              )}
+            </form.Subscribe>
+          </FieldGroup>
+        </form>
+      </CardContent>
+      <CardFooter className="justify-center">
+        <Button type="button" variant="link" onClick={onSwitchToSignUp}>
+          Need an account? Sign up
         </Button>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }

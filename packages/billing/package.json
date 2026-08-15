@@ -1,0 +1,23 @@
+{
+  "name": "@boilerplate/billing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@boilerplate/db": "*",
+    "@boilerplate/env": "*",
+    "drizzle-orm": "^0.45.2",
+    "stripe": "^22.5.0"
+  },
+  "devDependencies": {
+    "@boilerplate/config": "*",
+    "typescript": "^6.0.3"
+  }
+}

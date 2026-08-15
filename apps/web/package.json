@@ -5,11 +5,13 @@
   "scripts": {
     "dev": "next dev --port 3001",
     "build": "next build",
-    "check-types": "tsc --noEmit",
-    "start": "next start"
+    "postbuild": "node ../../scripts/prepare-standalone-web.mjs",
+    "check-types": "next typegen && tsc --noEmit",
+    "start": "node .next/standalone/apps/web/server.js"
   },
   "dependencies": {
     "@boilerplate/api": "*",
+    "@boilerplate/auth": "*",
     "@boilerplate/env": "*",
     "@boilerplate/ui": "*",
     "@swc/helpers": "^0.5.23",
