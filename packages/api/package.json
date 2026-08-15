@@ -1,0 +1,27 @@
+{
+  "name": "@boilerplate/api",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@boilerplate/auth": "*",
+    "@boilerplate/db": "*",
+    "@boilerplate/env": "*",
+    "@trpc/client": "^11.18.0",
+    "@trpc/server": "^11.18.0",
+    "dotenv": "^17.4.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@boilerplate/config": "*",
+    "hono": "^4.12.32",
+    "typescript": "^6.0.3"
+  }
+}

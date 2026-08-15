@@ -1,0 +1,55 @@
+{
+  "name": "boilerplate",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "vp run -r dev",
+    "build": "vp run -r build",
+    "check-types": "vp run -r check-types",
+    "check": "oxlint && oxfmt --write",
+    "lint": "vp lint",
+    "format": "vp fmt",
+    "staged": "vp staged",
+    "hooks:setup": "vp config",
+    "dev:web": "vp run --filter web dev",
+    "dev:server": "vp run --filter server dev",
+    "db:push": "vp run --filter @boilerplate/db db:push",
+    "db:studio": "vp run --filter @boilerplate/db db:studio",
+    "db:generate": "vp run --filter @boilerplate/db db:generate",
+    "db:migrate": "vp run --filter @boilerplate/db db:migrate",
+    "db:start": "docker compose up -d postgres",
+    "db:watch": "docker compose up postgres",
+    "db:stop": "docker compose stop postgres",
+    "db:down": "docker compose down postgres",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "dependencies": {
+    "@boilerplate/env": "*",
+    "dotenv": "^17.4.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@boilerplate/config": "*",
+    "@types/node": "^22.20.1",
+    "oxfmt": "^0.63.0",
+    "oxlint": "^1.78.0",
+    "rolldown": "1.2.0",
+    "typescript": "^6.0.3",
+    "vite-plus": "0.2.6"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.6"
+  },
+  "packageManager": "npm@12.0.2",
+  "allowScripts": {
+    "esbuild": true,
+    "sharp": true
+  }
+}
