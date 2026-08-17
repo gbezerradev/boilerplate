@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@boilerplate/config": "*",
-    "@types/node": "^22.20.1",
-    "typescript": "^6.0.3"
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2"
   }
 }
