@@ -17,9 +17,5 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       ? params.callbackURL
       : "/dashboard";
 
-  return (
-    <main id="main-content" className="flex min-h-svh items-center justify-center px-4 py-12">
-      <LoginPanel notice={notice} error={params.error} callbackURL={callbackURL} />
-    </main>
-  );
+  return <LoginPanel notice={notice} error={params.error} callbackURL={callbackURL} />;
 }

@@ -1,20 +1,18 @@
 "use client";
 
 import { Button } from "@boilerplate/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@boilerplate/ui/components/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@boilerplate/ui/components/field";
-import { Input } from "@boilerplate/ui/components/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@boilerplate/ui/components/input-group";
 import { useForm } from "@tanstack/react-form";
+import { AtSignIcon, LockKeyholeIcon, UserRoundIcon } from "lucide-react";
 import { toast } from "sonner";
 import z from "zod";
 
+import { AuthDivider } from "@/components/auth-divider";
 import { authClient } from "@/lib/auth-client";
 
 export default function SignUpForm({
@@ -63,110 +61,121 @@ export default function SignUpForm({
   });
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>
-          <h1>Create an account</h1>
-        </CardTitle>
-        <CardDescription>Start a new workspace in a few seconds.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            void form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <form.Field name="name">
-              {(field) => {
-                const isInvalid = field.state.meta.errors.length > 0;
+    <div className="flex flex-col gap-4">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          void form.handleSubmit();
+        }}
+      >
+        <FieldGroup>
+          <form.Field name="name">
+            {(field) => {
+              const isInvalid = field.state.meta.errors.length > 0;
 
-                return (
-                  <Field data-invalid={isInvalid || undefined}>
-                    <FieldLabel htmlFor={field.name}>Name</FieldLabel>
-                    <Input
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                  <InputGroup>
+                    <InputGroupAddon align="inline-start">
+                      <UserRoundIcon />
+                    </InputGroupAddon>
+                    <InputGroupInput
                       id={field.name}
                       name={field.name}
                       autoComplete="name"
+                      placeholder="Your name"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(event) => field.handleChange(event.target.value)}
                       aria-invalid={isInvalid}
                     />
-                    <FieldError errors={field.state.meta.errors} />
-                  </Field>
-                );
-              }}
-            </form.Field>
+                  </InputGroup>
+                  <FieldError errors={field.state.meta.errors} />
+                </Field>
+              );
+            }}
+          </form.Field>
 
-            <form.Field name="email">
-              {(field) => {
-                const isInvalid = field.state.meta.errors.length > 0;
+          <form.Field name="email">
+            {(field) => {
+              const isInvalid = field.state.meta.errors.length > 0;
 
-                return (
-                  <Field data-invalid={isInvalid || undefined}>
-                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                    <Input
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                  <InputGroup>
+                    <InputGroupAddon align="inline-start">
+                      <AtSignIcon />
+                    </InputGroupAddon>
+                    <InputGroupInput
                       id={field.name}
                       name={field.name}
                       type="email"
                       autoComplete="email"
+                      placeholder="you@example.com"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(event) => field.handleChange(event.target.value)}
                       aria-invalid={isInvalid}
                     />
-                    <FieldError errors={field.state.meta.errors} />
-                  </Field>
-                );
-              }}
-            </form.Field>
+                  </InputGroup>
+                  <FieldError errors={field.state.meta.errors} />
+                </Field>
+              );
+            }}
+          </form.Field>
 
-            <form.Field name="password">
-              {(field) => {
-                const isInvalid = field.state.meta.errors.length > 0;
+          <form.Field name="password">
+            {(field) => {
+              const isInvalid = field.state.meta.errors.length > 0;
 
-                return (
-                  <Field data-invalid={isInvalid || undefined}>
-                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                    <Input
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                  <InputGroup>
+                    <InputGroupAddon align="inline-start">
+                      <LockKeyholeIcon />
+                    </InputGroupAddon>
+                    <InputGroupInput
                       id={field.name}
                       name={field.name}
                       type="password"
                       autoComplete="new-password"
+                      placeholder="At least 8 characters"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(event) => field.handleChange(event.target.value)}
                       aria-invalid={isInvalid}
                     />
-                    <FieldError errors={field.state.meta.errors} />
-                  </Field>
-                );
-              }}
-            </form.Field>
+                  </InputGroup>
+                  <FieldError errors={field.state.meta.errors} />
+                </Field>
+              );
+            }}
+          </form.Field>
 
-            <form.Subscribe
-              selector={(state) => ({
-                canSubmit: state.canSubmit,
-                isSubmitting: state.isSubmitting,
-              })}
-            >
-              {({ canSubmit, isSubmitting }) => (
-                <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
-                  {isSubmitting ? "Creating account…" : "Create account"}
-                </Button>
-              )}
-            </form.Subscribe>
-          </FieldGroup>
-        </form>
-      </CardContent>
-      <CardFooter className="justify-center">
-        <Button type="button" variant="link" onClick={onSwitchToSignIn}>
-          Already have an account? Sign in
-        </Button>
-      </CardFooter>
-    </Card>
+          <form.Subscribe
+            selector={(state) => ({
+              canSubmit: state.canSubmit,
+              isSubmitting: state.isSubmitting,
+            })}
+          >
+            {({ canSubmit, isSubmitting }) => (
+              <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
+                {isSubmitting ? "Creating account…" : "Create account"}
+              </Button>
+            )}
+          </form.Subscribe>
+        </FieldGroup>
+      </form>
+
+      <AuthDivider>ALREADY A MEMBER?</AuthDivider>
+
+      <Button type="button" className="w-full" variant="outline" onClick={onSwitchToSignIn}>
+        Back to sign in
+      </Button>
+    </div>
   );
 }

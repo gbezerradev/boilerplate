@@ -1,17 +1,11 @@
 "use client";
 
-import { Button, buttonVariants } from "@boilerplate/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@boilerplate/ui/components/card";
+import { Button } from "@boilerplate/ui/components/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { AuthShell } from "@/components/auth-shell";
 import { authClient } from "@/lib/auth-client";
 
 export default function AcceptInvitation({ invitationId }: { invitationId?: string }) {
@@ -20,7 +14,7 @@ export default function AcceptInvitation({ invitationId }: { invitationId?: stri
 
   if (!invitationId) {
     return (
-      <InvitationCard
+      <InvitationState
         title="Invitation unavailable"
         description="This invitation link is incomplete."
       />
@@ -30,66 +24,51 @@ export default function AcceptInvitation({ invitationId }: { invitationId?: stri
   const callbackURL = `/accept-invitation?id=${encodeURIComponent(invitationId)}`;
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>
-          <h1>Join this workspace</h1>
-        </CardTitle>
-        <CardDescription>
-          Invitations are bound to the invited email address and expire after seven days.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {isPending ? (
-          <p className="text-muted-foreground">Checking your account…</p>
-        ) : session?.user ? (
-          <Button
-            className="w-full"
-            onClick={async () => {
-              await authClient.organization.acceptInvitation(
-                { invitationId },
-                {
-                  onSuccess: () => {
-                    toast.success("Invitation accepted.");
-                    router.push("/dashboard");
-                    router.refresh();
-                  },
-                  onError: ({ error }) => {
-                    toast.error(error.message || error.statusText);
-                  },
+    <AuthShell
+      title="Join this workspace"
+      description="Invitations are bound to the invited email address and expire after seven days."
+    >
+      {isPending ? (
+        <p className="text-muted-foreground">Checking your account…</p>
+      ) : session?.user ? (
+        <Button
+          className="w-full"
+          onClick={async () => {
+            await authClient.organization.acceptInvitation(
+              { invitationId },
+              {
+                onSuccess: () => {
+                  toast.success("Invitation accepted.");
+                  router.push("/dashboard");
+                  router.refresh();
                 },
-              );
-            }}
-          >
-            Accept invitation
-          </Button>
-        ) : (
-          <Link
-            href={`/login?callbackURL=${encodeURIComponent(callbackURL)}`}
-            className={buttonVariants({ variant: "default" })}
-          >
-            Sign in to accept
-          </Link>
-        )}
-      </CardContent>
-    </Card>
+                onError: ({ error }) => {
+                  toast.error(error.message || error.statusText);
+                },
+              },
+            );
+          }}
+        >
+          Accept invitation
+        </Button>
+      ) : (
+        <Button
+          nativeButton={false}
+          render={<Link href={`/login?callbackURL=${encodeURIComponent(callbackURL)}`} />}
+        >
+          Sign in to accept
+        </Button>
+      )}
+    </AuthShell>
   );
 }
 
-function InvitationCard({ title, description }: { title: string; description: string }) {
+function InvitationState({ title, description }: { title: string; description: string }) {
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>
-          <h1>{title}</h1>
-        </CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Link href="/login" className={buttonVariants({ variant: "default" })}>
-          Go to sign in
-        </Link>
-      </CardContent>
-    </Card>
+    <AuthShell title={title} description={description}>
+      <Button nativeButton={false} render={<Link href="/login" />}>
+        Go to sign in
+      </Button>
+    </AuthShell>
   );
 }

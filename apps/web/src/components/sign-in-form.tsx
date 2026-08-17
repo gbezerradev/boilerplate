@@ -1,29 +1,21 @@
 "use client";
 
 import { Button, buttonVariants } from "@boilerplate/ui/components/button";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@boilerplate/ui/components/field";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@boilerplate/ui/components/card";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@boilerplate/ui/components/field";
-import { Input } from "@boilerplate/ui/components/input";
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@boilerplate/ui/components/input-group";
 import { useForm } from "@tanstack/react-form";
+import { AtSignIcon, LockKeyholeIcon } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import z from "zod";
 
+import { AuthDivider } from "@/components/auth-divider";
 import { authClient } from "@/lib/auth-client";
 
 export default function SignInForm({
@@ -70,101 +62,101 @@ export default function SignInForm({
   });
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>
-          <h1>Welcome back</h1>
-        </CardTitle>
-        <CardDescription>Sign in to continue to your workspace.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            void form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <form.Field name="email">
-              {(field) => {
-                const isInvalid = field.state.meta.errors.length > 0;
+    <div className="flex flex-col gap-4">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          void form.handleSubmit();
+        }}
+      >
+        <FieldGroup>
+          <form.Field name="email">
+            {(field) => {
+              const isInvalid = field.state.meta.errors.length > 0;
 
-                return (
-                  <Field data-invalid={isInvalid || undefined}>
-                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                    <Input
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                  <InputGroup>
+                    <InputGroupAddon align="inline-start">
+                      <AtSignIcon />
+                    </InputGroupAddon>
+                    <InputGroupInput
                       id={field.name}
                       name={field.name}
                       type="email"
                       autoComplete="email"
+                      placeholder="you@example.com"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(event) => field.handleChange(event.target.value)}
                       aria-invalid={isInvalid}
                     />
-                    <FieldError errors={field.state.meta.errors} />
-                  </Field>
-                );
-              }}
-            </form.Field>
+                  </InputGroup>
+                  <FieldError errors={field.state.meta.errors} />
+                </Field>
+              );
+            }}
+          </form.Field>
 
-            <form.Field name="password">
-              {(field) => {
-                const isInvalid = field.state.meta.errors.length > 0;
+          <form.Field name="password">
+            {(field) => {
+              const isInvalid = field.state.meta.errors.length > 0;
 
-                return (
-                  <Field data-invalid={isInvalid || undefined}>
-                    <div className="flex items-center justify-between gap-4">
-                      <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                      <Link
-                        href="/forgot-password"
-                        className={buttonVariants({ variant: "link", size: "xs" })}
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                    <Input
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <div className="flex items-center justify-between gap-4">
+                    <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                    <Link
+                      href="/forgot-password"
+                      className={buttonVariants({ variant: "link", size: "xs" })}
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <InputGroup>
+                    <InputGroupAddon align="inline-start">
+                      <LockKeyholeIcon />
+                    </InputGroupAddon>
+                    <InputGroupInput
                       id={field.name}
                       name={field.name}
                       type="password"
                       autoComplete="current-password"
+                      placeholder="Enter your password"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(event) => field.handleChange(event.target.value)}
                       aria-invalid={isInvalid}
                     />
-                    <FieldError errors={field.state.meta.errors} />
-                  </Field>
-                );
-              }}
-            </form.Field>
-
-            <form.Subscribe
-              selector={(state) => ({
-                canSubmit: state.canSubmit,
-                isSubmitting: state.isSubmitting,
-              })}
-            >
-              {({ canSubmit, isSubmitting }) => (
-                <Field>
-                  <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
-                    {isSubmitting ? "Signing in…" : "Sign in"}
-                  </Button>
-                  <FieldDescription className="text-center">
-                    By continuing, you agree to the product terms and privacy policy.
-                  </FieldDescription>
+                  </InputGroup>
+                  <FieldError errors={field.state.meta.errors} />
                 </Field>
-              )}
-            </form.Subscribe>
-          </FieldGroup>
-        </form>
-      </CardContent>
-      <CardFooter className="justify-center">
-        <Button type="button" variant="link" onClick={onSwitchToSignUp}>
-          Need an account? Sign up
-        </Button>
-      </CardFooter>
-    </Card>
+              );
+            }}
+          </form.Field>
+
+          <form.Subscribe
+            selector={(state) => ({
+              canSubmit: state.canSubmit,
+              isSubmitting: state.isSubmitting,
+            })}
+          >
+            {({ canSubmit, isSubmitting }) => (
+              <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
+                {isSubmitting ? "Signing in…" : "Continue with email"}
+              </Button>
+            )}
+          </form.Subscribe>
+        </FieldGroup>
+      </form>
+
+      <AuthDivider>NEW HERE?</AuthDivider>
+
+      <Button type="button" className="w-full" variant="outline" onClick={onSwitchToSignUp}>
+        Create an account
+      </Button>
+    </div>
   );
 }

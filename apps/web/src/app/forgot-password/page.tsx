@@ -1,9 +1,13 @@
+import { AuthShell } from "@/components/auth-shell";
 import ForgotPasswordForm from "@/components/forgot-password-form";
 
 export default function ForgotPasswordPage() {
   return (
-    <main id="main-content" className="flex min-h-svh items-center justify-center px-4 py-12">
+    <AuthShell
+      title="Reset your password"
+      description="Enter your account email and we will send you a secure reset link."
+    >
       <ForgotPasswordForm />
-    </main>
+    </AuthShell>
   );
 }

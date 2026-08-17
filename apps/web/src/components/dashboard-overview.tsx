@@ -1,86 +1,106 @@
 "use client";
 
 import { Badge } from "@boilerplate/ui/components/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@boilerplate/ui/components/card";
-import { Skeleton } from "@boilerplate/ui/components/skeleton";
-import { useQuery } from "@tanstack/react-query";
+import { Button } from "@boilerplate/ui/components/button";
+import { Plus, Search, Sparkles } from "lucide-react";
 
-import { trpc } from "@/utils/trpc";
+import { DashboardKpiCard } from "./dashboard/dashboard-kpi-card";
+import {
+  ChannelBreakdownCard,
+  ConversationVolumeChart,
+  TrendChartCard,
+} from "./dashboard/dashboard-charts";
+import { dashboardKpis } from "./dashboard/dashboard-data";
+import {
+  RecentConversationsCard,
+  TeamOnDutyCard,
+  WorkspaceActivityCard,
+} from "./dashboard/dashboard-sections";
 
 export default function DashboardOverview() {
-  const projects = useQuery(trpc.projects.list.queryOptions());
-  const billing = useQuery(trpc.billing.status.queryOptions());
-
   return (
-    <div className="grid gap-6">
-      <header>
-        <h1 className="text-lg font-semibold tracking-tight">Overview</h1>
-        <p className="text-sm text-muted-foreground">Workspace health, usage, and plan limits.</p>
-      </header>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <MetricCard
-          title="Projects"
-          value={projects.isPending ? undefined : String(projects.data?.length ?? 0)}
-          description={`of ${billing.data?.entitlements.maxProjects ?? "—"} included`}
-        />
-        <MetricCard
-          title="Plan"
-          value={billing.data?.entitlements.plan ?? undefined}
-          description={billing.data?.enabled ? "Stripe billing enabled" : "Billing disabled"}
-        />
-        <MetricCard
-          title="Audit log"
-          value={billing.data?.entitlements.auditLog ? "Included" : "Upgrade"}
-          description="Workspace activity history"
-        />
-      </div>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <CardTitle>Tenant isolation</CardTitle>
-              <CardDescription>
-                Every product query is scoped by the active organization.
-              </CardDescription>
-            </div>
-            <Badge variant="outline">Enforced server-side</Badge>
+    <div className="flex flex-col gap-8 pb-8">
+      <header className="flex flex-col gap-5 border-b border-border/60 pb-7 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>Overview</span>
+            <span className="text-border">/</span>
+            <span className="text-foreground">Today</span>
           </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            The current workspace is resolved from the authenticated session. Client-supplied tenant
-            IDs are rejected by the API schemas.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              Good morning, welcome back
+            </h1>
+            <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
+              Here’s what’s happening across your customer workspace today.
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" className="rounded-lg">
+            <Search className="size-4" />
+            Search
+          </Button>
+          <Button className="rounded-lg">
+            <Plus className="size-4" />
+            New conversation
+          </Button>
+        </div>
+      </header>
 
-function MetricCard({
-  title,
-  value,
-  description,
-}: {
-  title: string;
-  value?: string;
-  description: string;
-}) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardDescription>{title}</CardDescription>
-        <CardTitle className="text-xl capitalize">
-          {value === undefined ? <Skeleton className="h-6 w-16" /> : value}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="text-xs text-muted-foreground">{description}</CardContent>
-    </Card>
+      <section aria-labelledby="metrics-heading" className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <h2 id="metrics-heading" className="text-sm font-medium">
+            Workspace pulse
+          </h2>
+          <Badge
+            variant="outline"
+            className="gap-1.5 rounded-full border-chart-2/30 bg-chart-2/10 text-chart-2"
+          >
+            <span className="size-1.5 rounded-full bg-chart-2" />
+            Demo data
+          </Badge>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {dashboardKpis.map((kpi) => (
+            <DashboardKpiCard key={kpi.label} kpi={kpi} />
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="analytics-heading" className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <h2 id="analytics-heading" className="text-sm font-medium">
+            Analytics
+          </h2>
+          <Button variant="ghost" size="sm" className="hidden text-xs sm:inline-flex">
+            Customize dashboard
+          </Button>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+          <ConversationVolumeChart />
+          <ChannelBreakdownCard />
+          <TrendChartCard kind="csat" />
+          <TrendChartCard kind="reply" />
+        </div>
+      </section>
+
+      <section aria-labelledby="operations-heading" className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <h2 id="operations-heading" className="text-sm font-medium">
+            Operations
+          </h2>
+          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Sparkles className="size-3.5" />
+            Updated a few seconds ago
+          </span>
+        </div>
+        <div className="grid gap-3 xl:grid-cols-4">
+          <TeamOnDutyCard />
+          <RecentConversationsCard />
+          <WorkspaceActivityCard />
+        </div>
+      </section>
+    </div>
   );
 }

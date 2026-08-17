@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { AuthShell } from "@/components/auth-shell";
 import SignInForm from "@/components/sign-in-form";
 import SignUpForm from "@/components/sign-up-form";
 
@@ -29,9 +30,33 @@ export default function LoginPanel({ notice, error, callbackURL }: LoginPanelPro
     }
   }, [error, notice]);
 
-  return showSignIn ? (
-    <SignInForm callbackURL={callbackURL} onSwitchToSignUp={() => setShowSignIn(false)} />
-  ) : (
-    <SignUpForm callbackURL={callbackURL} onSwitchToSignIn={() => setShowSignIn(true)} />
+  return (
+    <AuthShell
+      title={showSignIn ? "Welcome back" : "Create your account"}
+      description={
+        showSignIn
+          ? "Sign in to continue to your workspace."
+          : "Start a new workspace in a few seconds."
+      }
+      footer={
+        <>
+          By continuing, you agree to our{" "}
+          <a className="underline underline-offset-4 hover:text-primary" href="#">
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a className="underline underline-offset-4 hover:text-primary" href="#">
+            Privacy Policy
+          </a>
+          .
+        </>
+      }
+    >
+      {showSignIn ? (
+        <SignInForm callbackURL={callbackURL} onSwitchToSignUp={() => setShowSignIn(false)} />
+      ) : (
+        <SignUpForm callbackURL={callbackURL} onSwitchToSignIn={() => setShowSignIn(true)} />
+      )}
+    </AuthShell>
   );
 }
