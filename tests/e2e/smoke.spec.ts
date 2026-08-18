@@ -2,11 +2,19 @@ import { expect, test } from "@playwright/test";
 
 test("loads the application with a connected API and security headers", async ({ page }) => {
   const response = await page.goto("/");
+  const apiResponse = await page.request.get("http://localhost:3000/health/live");
 
   expect(response).not.toBeNull();
   expect(response?.headers()["x-content-type-options"]).toBe("nosniff");
-  await expect(page.getByText("API Status")).toBeVisible();
-  await expect(page.getByText("Connected")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Launch your SaaS without rebuilding the foundation" }),
+  ).toBeVisible();
+  expect(apiResponse.ok()).toBe(true);
+  expect(await apiResponse.json()).toEqual({
+    status: "ok",
+    service: "server",
+    uptimeSeconds: expect.any(Number),
+  });
 });
 
 test("exposes the complete password authentication flow", async ({ page }) => {
@@ -14,8 +22,8 @@ test("exposes the complete password authentication flow", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
   await expect(page.getByLabel("Email")).toHaveAttribute("autocomplete", "email");
 
-  await page.getByRole("button", { name: "Need an account? Sign up" }).click();
-  await expect(page.getByRole("heading", { name: "Create an account" })).toBeVisible();
+  await page.getByRole("button", { name: "Create an account" }).click();
+  await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
   await expect(page.getByLabel("Password")).toHaveAttribute("autocomplete", "new-password");
 
   await page.goto("/forgot-password");
@@ -40,9 +48,9 @@ test("protects organization routes and preserves invitation callbacks", async ({
   await expect(page.getByRole("heading", { name: "Invitation unavailable" })).toBeVisible();
 
   await page.goto("/accept-invitation?id=invite-id");
-  const signInLink = page.getByRole("link", { name: "Sign in to accept" });
-  await expect(signInLink).toBeVisible();
-  await expect(signInLink).toHaveAttribute("href", /callbackURL=.*accept-invitation/);
+  const signInButton = page.getByRole("button", { name: "Sign in to accept" });
+  await expect(signInButton).toBeVisible();
+  await expect(signInButton).toHaveAttribute("href", /callbackURL=.*accept-invitation/);
 
   await page.goto("/organization/invite");
   await expect(page).toHaveURL(
@@ -62,7 +70,7 @@ test("creates an email-verification account against PostgreSQL", async ({ page }
   );
 
   await page.goto("/login");
-  await page.getByRole("button", { name: "Need an account? Sign up" }).click();
+  await page.getByRole("button", { name: "Create an account" }).click();
   await page.getByLabel("Name").fill("CI User");
   await page.getByLabel("Email").fill(`ci-${Date.now()}-${crypto.randomUUID()}@example.com`);
   await page.getByLabel("Password").fill("correct-horse-battery-staple");
