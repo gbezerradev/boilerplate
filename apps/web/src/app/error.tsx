@@ -6,10 +6,10 @@ import { ErrorFallback } from "@/components/error-fallback";
 
 export default function ErrorPage({
   error,
-  retry,
+  reset,
 }: {
   error: Error & { digest?: string };
-  retry: () => void;
+  reset: () => void;
 }) {
   useEffect(() => {
     console.error(error);
@@ -19,7 +19,7 @@ export default function ErrorPage({
     <ErrorFallback
       title="Something went wrong"
       description="This page could not be loaded because of an unexpected error."
-      onRetry={retry}
+      onRetry={reset}
     />
   );
 }

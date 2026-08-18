@@ -1,40 +1,36 @@
 "use client";
 
 import { Button } from "@boilerplate/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@boilerplate/ui/components/card";
+import { HomeIcon, RotateCcwIcon } from "lucide-react";
+import Link from "next/link";
+
+import { ErrorPageShell } from "@/components/http-error-page";
 
 type ErrorFallbackProps = {
   title: string;
   description: string;
   onRetry: () => void;
+  contained?: boolean;
 };
 
-export function ErrorFallback({ title, description, onRetry }: ErrorFallbackProps) {
+export function ErrorFallback({
+  title,
+  description,
+  onRetry,
+  contained = false,
+}: ErrorFallbackProps) {
   return (
-    <main id="main-content" className="flex min-h-svh items-center justify-center p-6">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>
-            <h1>{title}</h1>
-          </CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            If the problem continues, try again later or contact support with the time it occurred.
-          </p>
-        </CardContent>
-        <CardFooter>
-          <Button onClick={onRetry}>Try again</Button>
-        </CardFooter>
-      </Card>
-    </main>
+    <ErrorPageShell code="500" contained={contained} description={description} title={title}>
+      <div className="flex flex-wrap justify-center gap-2">
+        <Button onClick={onRetry}>
+          <RotateCcwIcon data-icon="inline-start" />
+          Try again
+        </Button>
+        <Button nativeButton={false} render={<Link href="/" />} variant="outline">
+          <HomeIcon data-icon="inline-start" />
+          Go home
+        </Button>
+      </div>
+    </ErrorPageShell>
   );
 }

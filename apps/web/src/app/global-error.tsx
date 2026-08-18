@@ -8,10 +8,10 @@ import "../index.css";
 
 export default function GlobalError({
   error,
-  retry,
+  reset,
 }: {
   error: Error & { digest?: string };
-  retry: () => void;
+  reset: () => void;
 }) {
   useEffect(() => {
     console.error(error);
@@ -23,7 +23,7 @@ export default function GlobalError({
         <ErrorFallback
           title="The application encountered an error"
           description="The application shell could not be rendered safely."
-          onRetry={retry}
+          onRetry={reset}
         />
       </body>
     </html>

@@ -1,13 +1,7 @@
-import { buttonVariants } from "@boilerplate/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@boilerplate/ui/components/card";
+import { Button } from "@boilerplate/ui/components/button";
 import Link from "next/link";
 
+import { AuthShell } from "@/components/auth-shell";
 import ResetPasswordForm from "@/components/reset-password-form";
 
 interface ResetPasswordPageProps {
@@ -20,25 +14,21 @@ interface ResetPasswordPageProps {
 export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
   const { token, error } = await searchParams;
 
-  return (
-    <main id="main-content" className="flex min-h-svh items-center justify-center px-4 py-12">
-      {token && !error ? (
-        <ResetPasswordForm token={token} />
-      ) : (
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>
-              <h1>Reset link unavailable</h1>
-            </CardTitle>
-            <CardDescription>This password reset link is invalid or has expired.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link href="/forgot-password" className={buttonVariants({ variant: "default" })}>
-              Request another link
-            </Link>
-          </CardContent>
-        </Card>
-      )}
-    </main>
+  return token && !error ? (
+    <AuthShell
+      title="Choose a new password"
+      description="Use at least 8 characters and keep it unique to this account."
+    >
+      <ResetPasswordForm token={token} />
+    </AuthShell>
+  ) : (
+    <AuthShell
+      title="Reset link unavailable"
+      description="This password reset link is invalid or has expired."
+    >
+      <Button nativeButton={false} render={<Link href="/forgot-password" />}>
+        Request another link
+      </Button>
+    </AuthShell>
   );
 }

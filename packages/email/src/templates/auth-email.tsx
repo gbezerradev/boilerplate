@@ -1,3 +1,7 @@
+import * as React from "react";
+
+void React;
+
 interface AuthEmailProps {
   preview: string;
   heading: string;

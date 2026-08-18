@@ -1,24 +1,22 @@
 "use client";
 
-import { Button, buttonVariants } from "@boilerplate/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@boilerplate/ui/components/card";
+import { Button } from "@boilerplate/ui/components/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@boilerplate/ui/components/field";
-import { Input } from "@boilerplate/ui/components/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@boilerplate/ui/components/input-group";
 import { useForm } from "@tanstack/react-form";
-import Link from "next/link";
+import { AtSignIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
 
 export default function ForgotPasswordForm() {
+  const router = useRouter();
   const form = useForm({
     defaultValues: { email: "" },
     onSubmit: async ({ value }) => {
@@ -46,66 +44,63 @@ export default function ForgotPasswordForm() {
   });
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>
-          <h1>Reset your password</h1>
-        </CardTitle>
-        <CardDescription>
-          Enter your account email and we will send you a secure reset link.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            void form.handleSubmit();
-          }}
-        >
-          <FieldGroup>
-            <form.Field name="email">
-              {(field) => {
-                const isInvalid = field.state.meta.errors.length > 0;
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        void form.handleSubmit();
+      }}
+    >
+      <FieldGroup>
+        <form.Field name="email">
+          {(field) => {
+            const isInvalid = field.state.meta.errors.length > 0;
 
-                return (
-                  <Field data-invalid={isInvalid || undefined}>
-                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      type="email"
-                      autoComplete="email"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(event) => field.handleChange(event.target.value)}
-                      aria-invalid={isInvalid}
-                    />
-                    <FieldError errors={field.state.meta.errors} />
-                  </Field>
-                );
-              }}
-            </form.Field>
-            <form.Subscribe
-              selector={(state) => ({
-                canSubmit: state.canSubmit,
-                isSubmitting: state.isSubmitting,
-              })}
-            >
-              {({ canSubmit, isSubmitting }) => (
-                <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
-                  {isSubmitting ? "Sending link…" : "Send reset link"}
-                </Button>
-              )}
-            </form.Subscribe>
-          </FieldGroup>
-        </form>
-      </CardContent>
-      <CardFooter className="justify-center">
-        <Link href="/login" className={buttonVariants({ variant: "link" })}>
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                <InputGroup>
+                  <InputGroupAddon align="inline-start">
+                    <AtSignIcon />
+                  </InputGroupAddon>
+                  <InputGroupInput
+                    id={field.name}
+                    name={field.name}
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    aria-invalid={isInvalid}
+                  />
+                </InputGroup>
+                <FieldError errors={field.state.meta.errors} />
+              </Field>
+            );
+          }}
+        </form.Field>
+        <form.Subscribe
+          selector={(state) => ({
+            canSubmit: state.canSubmit,
+            isSubmitting: state.isSubmitting,
+          })}
+        >
+          {({ canSubmit, isSubmitting }) => (
+            <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
+              {isSubmitting ? "Sending link…" : "Send reset link"}
+            </Button>
+          )}
+        </form.Subscribe>
+        <Button
+          type="button"
+          className="w-full"
+          variant="outline"
+          onClick={() => router.push("/login")}
+        >
           Back to sign in
-        </Link>
-      </CardFooter>
-    </Card>
+        </Button>
+      </FieldGroup>
+    </form>
   );
 }

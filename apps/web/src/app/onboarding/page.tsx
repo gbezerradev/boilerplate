@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { AuthShell } from "@/components/auth-shell";
 import CreateOrganizationForm from "@/components/create-organization-form";
 import { authClient } from "@/lib/auth-client";
 
@@ -17,8 +18,11 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <main id="main-content" className="flex min-h-svh items-center justify-center px-4 py-12">
+    <AuthShell
+      title="Create your workspace"
+      description="Workspaces keep each organization’s data and access isolated."
+    >
       <CreateOrganizationForm />
-    </main>
+    </AuthShell>
   );
 }
