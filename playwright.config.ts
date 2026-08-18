@@ -47,6 +47,7 @@ export default defineConfig({
       timeout: 120_000,
       env: {
         NEXT_PUBLIC_SERVER_URL: serverUrl,
+        HOSTNAME: "0.0.0.0",
         PORT: "3001",
       },
     },
