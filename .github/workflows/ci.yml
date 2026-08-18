@@ -12,7 +12,10 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      options: --ipc=host
     services:
       postgres:
         image: postgres:18
@@ -28,7 +31,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      DATABASE_URL: postgresql://postgres:password@127.0.0.1:5432/boilerplate
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/boilerplate
       BETTER_AUTH_SECRET: ci-secret-that-is-at-least-thirty-two-characters
       BETTER_AUTH_URL: http://localhost:3000
       CORS_ORIGIN: http://localhost:3001
@@ -42,16 +45,23 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
-      - run: npm run db:migrate
+      - name: Install dependencies
+        timeout-minutes: 10
+        run: npm ci
+      - name: Apply database migrations
+        timeout-minutes: 5
+        run: npm run db:migrate
       - run: npm run format:check
       - run: npm run lint
       - run: npm run check-types
       - run: npm test
       - run: npm audit --omit=dev --audit-level=high
-      - run: npm run build
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - name: Build applications
+        timeout-minutes: 15
+        run: npm run build
+      - name: Run end-to-end tests
+        timeout-minutes: 15
+        run: npm run test:e2e
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
