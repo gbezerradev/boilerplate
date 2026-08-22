@@ -18,7 +18,7 @@
     "@hono/node-server": "^2.0.12",
     "@hono/trpc-server": "^0.4.2",
     "@trpc/server": "^11.18.0",
-    "better-auth": "1.6.27",
+    "better-auth": "1.7.1",
     "dotenv": "^17.4.2",
     "hono": "^4.12.32",
     "zod": "^4.4.3"
