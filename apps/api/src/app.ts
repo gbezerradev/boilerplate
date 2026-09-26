@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { env } from "./config/env";
+import { env } from "./env";
 import { routes } from "./http/routes";
 import { getAuth } from "./lib/auth";
 import { corsPlugin } from "./plugins/cors";

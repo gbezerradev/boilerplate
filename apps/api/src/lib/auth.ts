@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { env } from "../config/env";
+import { env } from "../env";
 import { getPrisma } from "./prisma";
 
 export function getAuth() {
