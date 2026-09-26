@@ -1,31 +1,20 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { ConflictError } from "../src/lib/errors";
-import type { User } from "../src/lib/types";
-import type { UserRepository } from "../src/repositories/user-repository";
+import { InMemoryUserRepository } from "../src/repositories/in-memory/user-repository";
 import { CreateUserUseCase } from "../src/use-cases/users/create-user";
 
-function makeUserRepository(existingUser: User | null = null): UserRepository {
-  return {
-    create: async (data) => ({
-      id: data.id ?? "user-1",
-      name: data.name,
-      email: data.email,
-      emailVerified: data.emailVerified ?? false,
-      image: data.image ?? null,
-      createdAt: data.createdAt ?? new Date("2026-01-01T00:00:00.000Z"),
-      updatedAt: data.updatedAt ?? new Date("2026-01-01T00:00:00.000Z"),
-    }),
-    findByEmail: async () => existingUser,
-    findById: async () => null,
-  };
-}
-
 describe("CreateUserUseCase", () => {
+  let repository: InMemoryUserRepository;
+
+  beforeEach(() => {
+    repository = new InMemoryUserRepository();
+  });
+
   it("normalizes the email before creating a user", async () => {
-    const useCase = new CreateUserUseCase(makeUserRepository());
+    const useCase = new CreateUserUseCase(repository);
 
     await expect(
-      useCase.execute({ name: "Ada", email: "ADA@EXAMPLE.COM" }),
+      useCase.execute({ id: "user-1", name: "Ada", email: "ADA@EXAMPLE.COM" }),
     ).resolves.toMatchObject({
       id: "user-1",
       email: "ada@example.com",
@@ -33,7 +22,7 @@ describe("CreateUserUseCase", () => {
   });
 
   it("rejects duplicate emails", async () => {
-    const existingUser = {
+    await repository.create({
       id: "user-1",
       name: "Ada",
       email: "ada@example.com",
@@ -41,8 +30,8 @@ describe("CreateUserUseCase", () => {
       image: null,
       createdAt: new Date(),
       updatedAt: new Date(),
-    } satisfies User;
-    const useCase = new CreateUserUseCase(makeUserRepository(existingUser));
+    });
+    const useCase = new CreateUserUseCase(repository);
 
     await expect(
       useCase.execute({ name: "Another Ada", email: "ADA@EXAMPLE.COM" }),
