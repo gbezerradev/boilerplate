@@ -5,9 +5,9 @@ import type {
   UpdateUserData,
   User,
 } from "../../lib/types";
-import type { UserRepositoryCrud } from "../user-repository";
+import type { UserRepository } from "../user-repository";
 
-export class InMemoryUserRepository implements UserRepositoryCrud {
+export class InMemoryUserRepository implements UserRepository {
   public readonly items: User[] = [];
 
   async create(data: CreateUserData): Promise<User> {

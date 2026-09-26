@@ -13,10 +13,4 @@ export interface UserRepository {
   delete?(id: EntityId): Promise<void>;
 }
 
-export interface UserRepositoryCrud extends UserRepository {
-  findById(id: EntityId): Promise<User | null>;
-  update(id: EntityId, data: UpdateUserData): Promise<User>;
-  delete(id: EntityId): Promise<void>;
-}
-
 export type IUserRepository = UserRepository;

@@ -5,7 +5,7 @@ import type {
   UpdateUserData,
   User,
 } from "../../lib/types";
-import type { UserRepositoryCrud } from "../user-repository";
+import type { UserRepository } from "../user-repository";
 
 export type PrismaUserClient = Pick<PrismaClient, "user">;
 
@@ -23,7 +23,7 @@ function toDomainUser(user: PrismaUser): User {
   };
 }
 
-export class PrismaUserRepository implements UserRepositoryCrud {
+export class PrismaUserRepository implements UserRepository {
   private readonly user;
 
   constructor(prisma: PrismaUserClient = getPrisma()) {
