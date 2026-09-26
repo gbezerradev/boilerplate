@@ -13,7 +13,6 @@ export interface UserRoutesOptions {
   getUserController?: UserControllerHandler;
 }
 
-/** Registers the HTTP routes for user operations. */
 export function createUserRoutes(options: UserRoutesOptions = {}) {
   const routes = new Hono();
   let createUserController: CreateUserController | undefined;

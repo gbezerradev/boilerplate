@@ -10,7 +10,6 @@ export interface UserFactoryOptions {
   repository?: UserRepository;
 }
 
-/** Wire the production Prisma implementation at the application boundary. */
 export function makeUserRepository(
   prisma: PrismaUserClient = getPrisma(),
 ): PrismaUserRepository {

@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-/** Input validation for creating a user through the HTTP layer. */
 export const createUserSchema = z.object({
   id: z.string().trim().min(1).optional(),
   name: z.string().trim().min(1, "Name is required").max(120),

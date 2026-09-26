@@ -23,7 +23,6 @@ function toDomainUser(user: PrismaUser): User {
   };
 }
 
-/** Prisma adapter for the framework-neutral UserRepository contract. */
 export class PrismaUserRepository implements UserRepositoryCrud {
   private readonly user;
 
@@ -80,8 +79,6 @@ export class PrismaUserRepository implements UserRepositoryCrud {
     await this.user.delete({ where: { id } });
   }
 
-  // Common read aliases keep the adapter convenient without widening the
-  // application-facing contract.
   async getById(id: EntityId): Promise<User | null> {
     return this.findById(id);
   }

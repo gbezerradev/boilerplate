@@ -13,7 +13,6 @@ export interface CreateUserControllerOptions {
   useCase?: CreateUserUseCase;
 }
 
-/** HTTP adapter for user creation. Business decisions stay in the use case. */
 export class CreateUserController {
   private readonly useCase: CreateUserUseCase;
 
@@ -44,7 +43,6 @@ export class CreateUserController {
   }
 }
 
-/** HTTP adapter for retrieving a user by id. */
 export class GetUserController {
   private readonly useCase: FindUserByIdUseCase;
 

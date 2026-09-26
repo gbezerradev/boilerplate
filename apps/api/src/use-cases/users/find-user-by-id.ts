@@ -7,7 +7,6 @@ import {
 import type { EntityId, User } from "../../lib/types";
 import type { UserRepository } from "../../repositories/user-repository";
 
-/** Retrieves a user by id through the repository abstraction. */
 export class FindUserByIdUseCase {
   constructor(private readonly users: UserRepository) {}
 

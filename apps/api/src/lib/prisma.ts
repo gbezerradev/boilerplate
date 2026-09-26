@@ -11,7 +11,6 @@ export function createPrismaClient(
   return new PrismaClient({ adapter });
 }
 
-/** Lazily construct Prisma so importing the app remains safe in tests. */
 export function getPrisma(): PrismaClient {
   prisma ??= createPrismaClient();
   return prisma;

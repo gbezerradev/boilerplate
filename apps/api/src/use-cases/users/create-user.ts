@@ -7,7 +7,6 @@ import {
 import type { CreateUserData, User } from "../../lib/types";
 import type { UserRepository } from "../../repositories/user-repository";
 
-/** Creates a user while keeping persistence behind the repository contract. */
 export class CreateUserUseCase {
   constructor(private readonly users: UserRepository) {}
 

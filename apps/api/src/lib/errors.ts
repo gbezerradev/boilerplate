@@ -11,7 +11,6 @@ export interface AppErrorOptions {
   statusCode?: number;
 }
 
-/** Base error shared by application and domain layers. */
 export class AppError extends Error {
   readonly code: ErrorCode;
   readonly statusCode: number;

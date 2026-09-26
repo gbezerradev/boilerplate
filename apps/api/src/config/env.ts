@@ -1,13 +1,6 @@
 import "dotenv/config";
 import { z } from "zod";
 
-/**
- * Runtime configuration for the API.
- *
- * Defaults intentionally keep the application importable in tests and local
- * development. Production deployments should provide their own database URL,
- * auth secret, and public URLs through the environment.
- */
 export const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -37,8 +30,6 @@ export function parseEnv(source: Record<string, unknown> = process.env): Env {
   return result.data;
 }
 
-/** Parsed once so consumers share one consistent configuration object. */
 export const env = parseEnv();
 
-/** Alias that makes the configuration intent explicit at call sites. */
 export const config = env;
