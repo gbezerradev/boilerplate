@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.com/schema.json",
+  "globalEnv": ["DATABASE_URL"],
   "globalDependencies": ["biome.json", "package-lock.json", "tsconfig.json"],
   "tasks": {
     "build": {
