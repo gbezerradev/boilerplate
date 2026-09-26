@@ -1,7 +1,8 @@
+import type { UserRepository } from "@boilerplate/core";
 import { Hono } from "hono";
 import { env } from "./env";
-import { routes } from "./http/routes";
-import { getAuth } from "./lib/auth";
+import { createRoutes } from "./http/routes";
+import { getRuntime } from "./lib/runtime";
 import { corsPlugin } from "./plugins/cors";
 
 export type AuthHandler = (request: Request) => Response | Promise<Response>;
@@ -9,10 +10,11 @@ export type AuthHandler = (request: Request) => Response | Promise<Response>;
 export interface AppOptions {
   authHandler?: AuthHandler;
   corsOrigin?: string;
+  userRepository?: UserRepository;
 }
 
 const defaultAuthHandler: AuthHandler = (request) => {
-  const handler = getAuth().handler;
+  const handler = getRuntime().auth.handler;
   if (!handler) {
     throw new Error("Better Auth handler is not available");
   }
@@ -38,7 +40,12 @@ export function createApp(options: AppOptions = {}) {
     authHandler(context.req.raw),
   );
 
-  app.route("/", routes);
+  app.route(
+    "/",
+    createRoutes({
+      userRepository: options.userRepository,
+    }),
+  );
 
   return app;
 }

@@ -3,9 +3,9 @@ import {
   isAppError,
   RepositoryError,
   ValidationError,
-} from "../../lib/errors";
-import type { CreateUserData, User } from "../../lib/types";
+} from "../../errors";
 import type { UserRepository } from "../../repositories/user-repository";
+import type { CreateUserData, User } from "../../types";
 
 export class CreateUserUseCase {
   constructor(private readonly users: UserRepository) {}

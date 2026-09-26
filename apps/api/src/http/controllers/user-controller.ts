@@ -1,23 +1,29 @@
+import type {
+  CreateUserUseCase,
+  FindUserByIdUseCase,
+  UserRepository,
+} from "@boilerplate/core";
+import { ValidationError } from "@boilerplate/core";
 import type { Context } from "hono";
 import {
   makeCreateUserUseCase,
   makeFindUserByIdUseCase,
 } from "../../factories/user-factory";
-import { ValidationError } from "../../lib/errors";
-import type { CreateUserUseCase } from "../../use-cases/users/create-user";
-import type { FindUserByIdUseCase } from "../../use-cases/users/find-user-by-id";
 import { respondWithError } from "../errors/http-error";
 import { createUserSchema } from "../schemas/user.schema";
 
 export interface CreateUserControllerOptions {
   useCase?: CreateUserUseCase;
+  repository?: UserRepository;
 }
 
 export class CreateUserController {
   private readonly useCase: CreateUserUseCase;
 
   constructor(options: CreateUserControllerOptions = {}) {
-    this.useCase = options.useCase ?? makeCreateUserUseCase();
+    this.useCase =
+      options.useCase ??
+      makeCreateUserUseCase({ repository: options.repository });
   }
 
   async handle(context: Context): Promise<Response> {
@@ -46,8 +52,15 @@ export class CreateUserController {
 export class GetUserController {
   private readonly useCase: FindUserByIdUseCase;
 
-  constructor(options: { useCase?: FindUserByIdUseCase } = {}) {
-    this.useCase = options.useCase ?? makeFindUserByIdUseCase();
+  constructor(
+    options: {
+      useCase?: FindUserByIdUseCase;
+      repository?: UserRepository;
+    } = {},
+  ) {
+    this.useCase =
+      options.useCase ??
+      makeFindUserByIdUseCase({ repository: options.repository });
   }
 
   async handle(context: Context): Promise<Response> {

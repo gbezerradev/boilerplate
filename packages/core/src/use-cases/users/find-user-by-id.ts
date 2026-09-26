@@ -3,9 +3,9 @@ import {
   NotFoundError,
   RepositoryError,
   ValidationError,
-} from "../../lib/errors";
-import type { EntityId, User } from "../../lib/types";
+} from "../../errors";
 import type { UserRepository } from "../../repositories/user-repository";
+import type { EntityId, User } from "../../types";
 
 export class FindUserByIdUseCase {
   constructor(private readonly users: UserRepository) {}

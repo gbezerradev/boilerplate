@@ -1,9 +1,4 @@
-import type {
-  CreateUserData,
-  EntityId,
-  UpdateUserData,
-  User,
-} from "../lib/types";
+import type { CreateUserData, EntityId, UpdateUserData, User } from "../types";
 
 export interface UserRepository {
   create(data: CreateUserData): Promise<User>;

@@ -1,11 +1,11 @@
-import { NotFoundError } from "../../lib/errors";
+import { NotFoundError } from "../../src/errors";
+import type { UserRepository } from "../../src/repositories/user-repository";
 import type {
   CreateUserData,
   EntityId,
   UpdateUserData,
   User,
-} from "../../lib/types";
-import type { UserRepository } from "../user-repository";
+} from "../../src/types";
 
 export class InMemoryUserRepository implements UserRepository {
   public readonly items: User[] = [];

@@ -8,12 +8,10 @@ export type ErrorCode =
 export interface AppErrorOptions {
   cause?: unknown;
   details?: unknown;
-  statusCode?: number;
 }
 
 export class AppError extends Error {
   readonly code: ErrorCode;
-  readonly statusCode: number;
   readonly details?: unknown;
 
   constructor(
@@ -24,35 +22,34 @@ export class AppError extends Error {
     super(message, { cause: options.cause });
     this.name = "AppError";
     this.code = code;
-    this.statusCode = options.statusCode ?? 500;
     this.details = options.details;
   }
 }
 
 export class ValidationError extends AppError {
   constructor(message = "The supplied data is invalid", details?: unknown) {
-    super(message, "VALIDATION_ERROR", { details, statusCode: 400 });
+    super(message, "VALIDATION_ERROR", { details });
     this.name = "ValidationError";
   }
 }
 
 export class ConflictError extends AppError {
   constructor(message = "The requested resource conflicts with existing data") {
-    super(message, "CONFLICT", { statusCode: 409 });
+    super(message, "CONFLICT");
     this.name = "ConflictError";
   }
 }
 
 export class NotFoundError extends AppError {
   constructor(message = "The requested resource was not found") {
-    super(message, "NOT_FOUND", { statusCode: 404 });
+    super(message, "NOT_FOUND");
     this.name = "NotFoundError";
   }
 }
 
 export class RepositoryError extends AppError {
   constructor(message = "The repository operation failed", cause?: unknown) {
-    super(message, "REPOSITORY_ERROR", { cause, statusCode: 500 });
+    super(message, "REPOSITORY_ERROR", { cause });
     this.name = "RepositoryError";
   }
 }

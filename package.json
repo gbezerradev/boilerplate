@@ -21,6 +21,8 @@
     "test": "turbo run test",
     "db:generate": "turbo run db:generate",
     "db:migrate": "turbo run db:migrate",
+    "db:seed": "turbo run db:seed",
+    "db:reset": "turbo run db:reset",
     "db:push": "turbo run db:push",
     "db:studio": "turbo run db:studio"
   },

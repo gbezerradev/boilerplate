@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { NotFoundError, ValidationError } from "../src/lib/errors";
-import { InMemoryUserRepository } from "../src/repositories/in-memory/user-repository";
+import { NotFoundError, ValidationError } from "../src/errors";
 import { FindUserByIdUseCase } from "../src/use-cases/users/find-user-by-id";
+import { InMemoryUserRepository } from "./helpers/in-memory-user-repository";
 
 describe("FindUserByIdUseCase", () => {
   let repository: InMemoryUserRepository;

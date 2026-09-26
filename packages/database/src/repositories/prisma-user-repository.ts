@@ -1,15 +1,13 @@
-import type { PrismaClient, User as PrismaUser } from "@prisma/client";
 import type {
   CreateUserData,
   EntityId,
   UpdateUserData,
   User,
-} from "../../lib/types";
-import type { UserRepository } from "../user-repository";
+  UserRepository,
+} from "@boilerplate/core";
+import type { PrismaClient, User as PrismaUser } from "@prisma/client";
 
 export type PrismaUserClient = Pick<PrismaClient, "user">;
-
-import { getPrisma } from "../../lib/prisma";
 
 function toDomainUser(user: PrismaUser): User {
   return {
@@ -26,7 +24,7 @@ function toDomainUser(user: PrismaUser): User {
 export class PrismaUserRepository implements UserRepository {
   private readonly user;
 
-  constructor(prisma: PrismaUserClient = getPrisma()) {
+  constructor(prisma: PrismaUserClient) {
     this.user = prisma.user;
   }
 

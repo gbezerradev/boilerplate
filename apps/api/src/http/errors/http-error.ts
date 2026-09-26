@@ -1,6 +1,14 @@
+import { type ErrorCode, isAppError } from "@boilerplate/core";
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
-import { isAppError } from "../../lib/errors";
+
+const statusByErrorCode: Record<ErrorCode, ContentfulStatusCode> = {
+  VALIDATION_ERROR: 400,
+  CONFLICT: 409,
+  NOT_FOUND: 404,
+  REPOSITORY_ERROR: 500,
+  INTERNAL_ERROR: 500,
+};
 
 export function respondWithError(context: Context, error: unknown): Response {
   if (isAppError(error)) {
@@ -12,7 +20,7 @@ export function respondWithError(context: Context, error: unknown): Response {
           ...(error.details === undefined ? {} : { details: error.details }),
         },
       },
-      error.statusCode as ContentfulStatusCode,
+      statusByErrorCode[error.code],
     );
   }
 

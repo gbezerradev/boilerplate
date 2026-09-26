@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { ConflictError } from "../src/lib/errors";
-import { InMemoryUserRepository } from "../src/repositories/in-memory/user-repository";
+import { ConflictError } from "../src/errors";
 import { CreateUserUseCase } from "../src/use-cases/users/create-user";
+import { InMemoryUserRepository } from "./helpers/in-memory-user-repository";
 
 describe("CreateUserUseCase", () => {
   let repository: InMemoryUserRepository;

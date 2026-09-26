@@ -1,3 +1,4 @@
+import type { UserRepository } from "@boilerplate/core";
 import { type Context, Hono } from "hono";
 import {
   CreateUserController,
@@ -11,6 +12,7 @@ export type UserControllerHandler = (
 export interface UserRoutesOptions {
   createUserController?: UserControllerHandler;
   getUserController?: UserControllerHandler;
+  userRepository?: UserRepository;
 }
 
 export function createUserRoutes(options: UserRoutesOptions = {}) {
@@ -21,13 +23,17 @@ export function createUserRoutes(options: UserRoutesOptions = {}) {
   const createUser =
     options.createUserController ??
     ((context: Context) => {
-      createUserController ??= new CreateUserController();
+      createUserController ??= new CreateUserController({
+        repository: options.userRepository,
+      });
       return createUserController.handle(context);
     });
   const getUser =
     options.getUserController ??
     ((context: Context) => {
-      getUserController ??= new GetUserController();
+      getUserController ??= new GetUserController({
+        repository: options.userRepository,
+      });
       return getUserController.handle(context);
     });
 

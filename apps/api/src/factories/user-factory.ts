@@ -1,33 +1,30 @@
-import { getPrisma } from "../lib/prisma";
-import type { PrismaUserClient } from "../repositories/prisma/user-repository";
-import { PrismaUserRepository } from "../repositories/prisma/user-repository";
-import type { UserRepository } from "../repositories/user-repository";
-import { CreateUserUseCase } from "../use-cases/users/create-user";
-import { FindUserByIdUseCase } from "../use-cases/users/find-user-by-id";
+import type {
+  CreateUserUseCase,
+  FindUserByIdUseCase,
+  UserRepository,
+} from "@boilerplate/core";
+import {
+  CreateUserUseCase as CreateUser,
+  FindUserByIdUseCase as FindUserById,
+} from "@boilerplate/core";
+import { getRuntime } from "../lib/runtime";
 
 export interface UserFactoryOptions {
-  prisma?: PrismaUserClient;
   repository?: UserRepository;
 }
 
-export function makeUserRepository(
-  prisma: PrismaUserClient = getPrisma(),
-): PrismaUserRepository {
-  return new PrismaUserRepository(prisma);
+export function makeUserRepository(): UserRepository {
+  return getRuntime().userRepository;
 }
 
 export function makeCreateUserUseCase(
   options: UserFactoryOptions = {},
 ): CreateUserUseCase {
-  return new CreateUserUseCase(
-    options.repository ?? makeUserRepository(options.prisma),
-  );
+  return new CreateUser(options.repository ?? makeUserRepository());
 }
 
 export function makeFindUserByIdUseCase(
   options: UserFactoryOptions = {},
 ): FindUserByIdUseCase {
-  return new FindUserByIdUseCase(
-    options.repository ?? makeUserRepository(options.prisma),
-  );
+  return new FindUserById(options.repository ?? makeUserRepository());
 }
