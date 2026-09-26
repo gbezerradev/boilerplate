@@ -1,0 +1,28 @@
+# Dependencies and package-manager state
+node_modules/
+.npm/
+
+# Build and task-runner output
+.turbo/
+.next/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Local environment files (keep examples committed)
+.env
+.env.*
+!.env.example
+
+# Logs and local tooling
+*.log
+npm-debug.log*
+debug.log*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
