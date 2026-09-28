@@ -1,0 +1,3 @@
+interface:
+  display_name: "Prompt de Landing Page"
+  short_description: "Gera prompts para builders a partir do briefing do app"
